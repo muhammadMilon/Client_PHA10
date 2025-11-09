@@ -1,13 +1,15 @@
-import { useState } from 'react';
-import { Film, Mail, Lock } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { toast } from 'react-toastify';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { Mail, Lock } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { toast } from "react-toastify";
 
-const Login = ({ onNavigate }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { signIn, signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,30 +17,65 @@ const Login = ({ onNavigate }) => {
 
     try {
       await signIn(email, password);
-      toast.success('Successfully logged in!');
-      onNavigate('home');
+      toast.success("Successfully logged in!");
+      navigate("/");
     } catch (err) {
-      toast.error(err.message || 'Failed to login. Please check your credentials.');
+      let errorMessage = "Failed to login. Please check your credentials.";
+      if (err.code === "auth/user-not-found") {
+        errorMessage =
+          "No account found with this email. Please register first.";
+      } else if (err.code === "auth/wrong-password") {
+        errorMessage = "Incorrect password. Please try again.";
+      } else if (err.code === "auth/invalid-email") {
+        errorMessage = "Invalid email address. Please check your email.";
+      } else if (err.code === "auth/user-disabled") {
+        errorMessage =
+          "This account has been disabled. Please contact support.";
+      } else if (err.code === "auth/too-many-requests") {
+        errorMessage = "Too many failed attempts. Please try again later.";
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
+    setLoading(true);
     try {
       await signInWithGoogle();
-      toast.success('Redirecting to Google...');
+      toast.success("Successfully logged in with Google!");
+      navigate("/");
     } catch (err) {
-      toast.error(err.message || 'Failed to login with Google.');
+      let errorMessage = "Failed to login with Google. Please try again.";
+      if (err.code === "auth/popup-closed-by-user") {
+        errorMessage = "Sign-in popup was closed. Please try again.";
+      } else if (err.code === "auth/popup-blocked") {
+        errorMessage = "Popup was blocked. Please allow popups for this site.";
+      } else if (err.code === "auth/cancelled-popup-request") {
+        errorMessage = "Only one popup request is allowed at a time.";
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4 py-12">
+    <div className="min-h-[calc(100vh-200px)] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full">
         <div className="text-center mb-8 animate-fade-in">
-          <div className="flex justify-center mb-4">
-            <Film className="w-16 h-16 text-red-500 animate-pulse" />
+          <div className="flex justify-center items-center space-x-3 mb-4">
+            <img
+              src="/assets/logo.jpg"
+              alt="Logo"
+              className="w-16 h-16 rounded-full object-cover border-2"
+            />
+            <span className="text-3xl font-bold text-white">MovieMaster</span>
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">Welcome Back</h1>
           <p className="text-gray-400">Login to access your movie collection</p>
@@ -57,7 +94,7 @@ const Login = ({ onNavigate }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all"
                   placeholder="Enter your email"
                 />
               </div>
@@ -74,7 +111,7 @@ const Login = ({ onNavigate }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all"
                   placeholder="Enter your password"
                 />
               </div>
@@ -83,9 +120,9 @@ const Login = ({ onNavigate }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? "Logging in..." : "Login"}
             </button>
           </form>
 
@@ -95,14 +132,17 @@ const Login = ({ onNavigate }) => {
                 <div className="w-full border-t border-slate-600"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-slate-800 text-gray-400">Or continue with</span>
+                <span className="px-2 bg-slate-800 text-gray-400">
+                  Or continue with
+                </span>
               </div>
             </div>
 
             <button
               onClick={handleGoogleLogin}
               type="button"
-              className="mt-4 w-full py-3 bg-white hover:bg-gray-100 text-gray-800 font-semibold rounded-lg transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
+              disabled={loading}
+              className="mt-4 w-full py-3 bg-white hover:bg-gray-100 text-gray-800 font-semibold rounded-lg transition-all transform hover:scale-105 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -126,15 +166,24 @@ const Login = ({ onNavigate }) => {
             </button>
           </div>
 
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              className="text-sm text-gray-400 hover:text-gray-300 transition-colors"
+            >
+              Forgot Password?
+            </button>
+          </div>
+
           <div className="mt-6 text-center">
             <p className="text-gray-400">
-              Don't have an account?{' '}
-              <button
-                onClick={() => onNavigate('register')}
-                className="text-red-500 hover:text-red-400 font-medium transition-colors"
+              Don't have an account?{" "}
+              <Link
+                to="/register"
+                className="text-gray-400 hover:text-gray-300 font-medium transition-colors"
               >
                 Register here
-              </button>
+              </Link>
             </p>
           </div>
         </div>

@@ -1,81 +1,126 @@
-import { useState } from 'react';
-import { Film, Mail, Lock, User } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { toast } from 'react-toastify';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { Mail, Lock, User } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { toast } from "react-toastify";
 
-const Register = ({ onNavigate }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [photoURL, setPhotoURL] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+const Register = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [photoURL, setPhotoURL] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
   const { signUp, signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
 
   const validatePassword = (password) => {
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const isLongEnough = password.length >= 6;
 
+    if (!isLongEnough) {
+      return "Password must be at least 6 characters long";
+    }
     if (!hasUpperCase) {
-      return 'Password must contain at least one uppercase letter';
+      return "Password must contain at least one uppercase letter";
     }
     if (!hasLowerCase) {
-      return 'Password must contain at least one lowercase letter';
-    }
-    if (!isLongEnough) {
-      return 'Password must be at least 6 characters long';
+      return "Password must contain at least one lowercase letter";
     }
     return null;
+  };
+
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    if (newPassword) {
+      const error = validatePassword(newPassword);
+      setPasswordError(error || "");
+    } else {
+      setPasswordError("");
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error("Passwords do not match");
       return;
     }
 
-    const passwordError = validatePassword(password);
-    if (passwordError) {
-      toast.error(passwordError);
+    const error = validatePassword(password);
+    if (error) {
+      toast.error(error);
+      setPasswordError(error);
       return;
     }
 
     setLoading(true);
 
     try {
-      await signUp(email, password);
-      toast.success('Account created successfully! Logging you in...');
-      setTimeout(() => {
-        onNavigate('home');
-      }, 1500);
+      await signUp(email, password, name, photoURL);
+      toast.success("Account created successfully! Logging you in...");
+      navigate("/");
     } catch (err) {
-      toast.error(err.message || 'Failed to create account. Please try again.');
+      let errorMessage = "Failed to create account. Please try again.";
+      if (err.code === "auth/email-already-in-use") {
+        errorMessage =
+          "This email is already registered. Please login instead.";
+      } else if (err.code === "auth/weak-password") {
+        errorMessage = "Password is too weak. Please use a stronger password.";
+      } else if (err.code === "auth/invalid-email") {
+        errorMessage = "Invalid email address. Please check your email.";
+      }
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleRegister = async () => {
+    setLoading(true);
     try {
       await signInWithGoogle();
-      toast.success('Redirecting to Google...');
+      toast.success("Successfully registered with Google!");
+      navigate("/");
     } catch (err) {
-      toast.error(err.message || 'Failed to register with Google.');
+      let errorMessage = "Failed to register with Google. Please try again.";
+      if (err.code === "auth/popup-closed-by-user") {
+        errorMessage = "Sign-in popup was closed. Please try again.";
+      } else if (err.code === "auth/popup-blocked") {
+        errorMessage = "Popup was blocked. Please allow popups for this site.";
+      } else if (err.code === "auth/cancelled-popup-request") {
+        errorMessage = "Only one popup request is allowed at a time.";
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4 py-12">
+    <div className="min-h-[calc(100vh-200px)] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full">
         <div className="text-center mb-8 animate-fade-in">
-          <div className="flex justify-center mb-4">
-            <Film className="w-16 h-16 text-red-500 animate-pulse" />
+          <div className="flex justify-center items-center space-x-3 mb-4">
+            <img
+              src="/assets/logo.jpg"
+              alt="Logo"
+              className="w-16 h-16 rounded-full object-cover border-2"
+            />
+            <span className="text-3xl font-bold text-white">MovieMaster</span>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Join MovieMaster</h1>
-          <p className="text-gray-400">Create your account to start your movie journey</p>
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Join MovieMaster
+          </h1>
+          <p className="text-gray-400">
+            Create your account to start your movie journey
+          </p>
         </div>
 
         <div className="bg-slate-800 rounded-2xl shadow-2xl p-8 border border-slate-700 animate-fade-in">
@@ -91,7 +136,7 @@ const Register = ({ onNavigate }) => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all"
                   placeholder="Enter your name"
                 />
               </div>
@@ -108,7 +153,7 @@ const Register = ({ onNavigate }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all"
                   placeholder="Enter your email"
                 />
               </div>
@@ -124,7 +169,7 @@ const Register = ({ onNavigate }) => {
                   type="url"
                   value={photoURL}
                   onChange={(e) => setPhotoURL(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all"
                   placeholder="Enter photo URL (optional)"
                 />
               </div>
@@ -139,15 +184,26 @@ const Register = ({ onNavigate }) => {
                 <input
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={handlePasswordChange}
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  className={`w-full pl-10 pr-4 py-3 bg-slate-700 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all ${
+                    passwordError ? "border-yellow-500" : "border-slate-600"
+                  }`}
                   placeholder="Create a password"
                 />
               </div>
-              <p className="mt-2 text-xs text-gray-400">
-                Must contain uppercase, lowercase, and be at least 6 characters
-              </p>
+              {passwordError && (
+                <p className="mt-2 text-xs text-yellow-400">{passwordError}</p>
+              )}
+              {!passwordError && password && (
+                <p className="mt-2 text-xs text-green-400">Password is valid</p>
+              )}
+              {!password && (
+                <p className="mt-2 text-xs text-gray-400">
+                  Must contain uppercase, lowercase, and be at least 6
+                  characters
+                </p>
+              )}
             </div>
 
             <div>
@@ -161,7 +217,7 @@ const Register = ({ onNavigate }) => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all"
                   placeholder="Confirm your password"
                 />
               </div>
@@ -170,9 +226,9 @@ const Register = ({ onNavigate }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 
@@ -182,14 +238,17 @@ const Register = ({ onNavigate }) => {
                 <div className="w-full border-t border-slate-600"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-slate-800 text-gray-400">Or continue with</span>
+                <span className="px-2 bg-slate-800 text-gray-400">
+                  Or continue with
+                </span>
               </div>
             </div>
 
             <button
               onClick={handleGoogleRegister}
               type="button"
-              className="mt-4 w-full py-3 bg-white hover:bg-gray-100 text-gray-800 font-semibold rounded-lg transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
+              disabled={loading}
+              className="mt-4 w-full py-3 bg-white hover:bg-gray-100 text-gray-800 font-semibold rounded-lg transition-all transform hover:scale-105 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -215,13 +274,13 @@ const Register = ({ onNavigate }) => {
 
           <div className="mt-6 text-center">
             <p className="text-gray-400">
-              Already have an account?{' '}
-              <button
-                onClick={() => onNavigate('login')}
-                className="text-red-500 hover:text-red-400 font-medium transition-colors"
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-gray-400 hover:text-gray-300 font-medium transition-colors"
               >
                 Login here
-              </button>
+              </Link>
             </p>
           </div>
         </div>
