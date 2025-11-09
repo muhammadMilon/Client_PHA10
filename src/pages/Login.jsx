@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { useTheme } from "../contexts/ThemeContext";
 import { toast } from "react-toastify";
 
 const Login = () => {
@@ -9,6 +10,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { signIn, signInWithGoogle } = useAuth();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -66,7 +68,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-200px)] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 py-12">
+    <div
+      className={`min-h-[calc(100vh-200px)] flex items-center justify-center px-4 py-12 transition-colors ${
+        isDark
+          ? "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
+          : "bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100"
+      }`}
+    >
       <div className="max-w-md w-full">
         <div className="text-center mb-8 animate-fade-in">
           <div className="flex justify-center items-center space-x-3 mb-4">
@@ -75,43 +83,87 @@ const Login = () => {
               alt="Logo"
               className="w-16 h-16 rounded-full object-cover border-2"
             />
-            <span className="text-3xl font-bold text-white">MovieMaster</span>
+            <span
+              className={`text-3xl font-bold ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}
+            >
+              MovieMaster
+            </span>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Welcome Back</h1>
-          <p className="text-gray-400">Login to access your movie collection</p>
+          <h1
+            className={`text-4xl font-bold mb-2 ${
+              isDark ? "text-white" : "text-gray-900"
+            }`}
+          >
+            Welcome Back
+          </h1>
+          <p className={isDark ? "text-gray-400" : "text-gray-600"}>
+            Login to access your movie collection
+          </p>
         </div>
 
-        <div className="bg-slate-800 rounded-2xl shadow-2xl p-8 border border-slate-700 animate-fade-in">
+        <div
+          className={`rounded-2xl shadow-2xl p-8 border animate-fade-in ${
+            isDark
+              ? "bg-slate-800 border-slate-700"
+              : "bg-white border-gray-200"
+          }`}
+        >
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                className={`block text-sm font-medium mb-2 ${
+                  isDark ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                <Mail
+                  className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
+                    isDark ? "text-gray-500" : "text-gray-400"
+                  }`}
+                />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all"
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
+                    isDark
+                      ? "bg-slate-700 border-slate-600 text-white focus:ring-gray-500"
+                      : "bg-gray-50 border-gray-300 text-gray-900 focus:ring-blue-500"
+                  }`}
                   placeholder="Enter your email"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                className={`block text-sm font-medium mb-2 ${
+                  isDark ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                <Lock
+                  className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
+                    isDark ? "text-gray-500" : "text-gray-400"
+                  }`}
+                />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all"
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
+                    isDark
+                      ? "bg-slate-700 border-slate-600 text-white focus:ring-gray-500"
+                      : "bg-gray-50 border-gray-300 text-gray-900 focus:ring-blue-500"
+                  }`}
                   placeholder="Enter your password"
                 />
               </div>
@@ -120,7 +172,11 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className={`w-full py-3 font-semibold rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
+                isDark
+                  ? "bg-slate-700 hover:bg-slate-600 text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
             >
               {loading ? "Logging in..." : "Login"}
             </button>
@@ -129,10 +185,20 @@ const Login = () => {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-600"></div>
+                <div
+                  className={`w-full border-t ${
+                    isDark ? "border-slate-600" : "border-gray-300"
+                  }`}
+                ></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-slate-800 text-gray-400">
+                <span
+                  className={`px-2 ${
+                    isDark
+                      ? "bg-slate-800 text-gray-400"
+                      : "bg-white text-gray-500"
+                  }`}
+                >
                   Or continue with
                 </span>
               </div>
@@ -142,7 +208,7 @@ const Login = () => {
               onClick={handleGoogleLogin}
               type="button"
               disabled={loading}
-              className="mt-4 w-full py-3 bg-white hover:bg-gray-100 text-gray-800 font-semibold rounded-lg transition-all transform hover:scale-105 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="mt-4 w-full py-3 bg-white hover:bg-gray-100 text-gray-800 font-semibold rounded-lg transition-all transform hover:scale-105 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 border border-gray-300"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -169,18 +235,26 @@ const Login = () => {
           <div className="mt-4 text-center">
             <button
               type="button"
-              className="text-sm text-gray-400 hover:text-gray-300 transition-colors"
+              className={`text-sm transition-colors ${
+                isDark
+                  ? "text-gray-400 hover:text-gray-300"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
             >
               Forgot Password?
             </button>
           </div>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-400">
+            <p className={isDark ? "text-gray-400" : "text-gray-600"}>
               Don't have an account?{" "}
               <Link
                 to="/register"
-                className="text-gray-400 hover:text-gray-300 font-medium transition-colors"
+                className={`font-medium transition-colors ${
+                  isDark
+                    ? "text-gray-400 hover:text-gray-300"
+                    : "text-blue-600 hover:text-blue-700"
+                }`}
               >
                 Register here
               </Link>

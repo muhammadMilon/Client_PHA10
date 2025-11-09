@@ -9,8 +9,12 @@ import {
 } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import NotFound from "./pages/NotFound";
+import AllMovies from "./pages/AllMovies";
+import MyCollection from "./pages/MyCollection";
 import { AuthProvider } from "./contexts/AuthContext";
-import { ToastContainer } from "react-toastify";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import ErrorBoundary from "./components/ErrorBoundary";
 import "react-toastify/dist/ReactToastify.css";
 
 const router = createBrowserRouter([
@@ -32,11 +36,15 @@ const router = createBrowserRouter([
       },
       {
         path: "all-movies",
-        element: <div className="container mx-auto px-4 py-8 text-center"><h1 className="text-4xl font-bold mb-4">All Movies</h1><p className="text-lg text-gray-300">Coming soon...</p></div>,
+        element: <AllMovies />,
       },
       {
         path: "my-collection",
-        element: <div className="container mx-auto px-4 py-8 text-center"><h1 className="text-4xl font-bold mb-4">My Collection</h1><p className="text-lg text-gray-300">Coming soon...</p></div>,
+        element: <MyCollection />,
+      },
+      {
+        path: "*",
+        element: <NotFound />,
       },
     ],
   },
@@ -44,20 +52,12 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
-    </AuthProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   </StrictMode>
 );

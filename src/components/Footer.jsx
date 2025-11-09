@@ -1,10 +1,12 @@
 import { Mail, MapPin, Phone } from "lucide-react";
+import { useTheme } from "../contexts/ThemeContext";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { isDark } = useTheme();
 
   return (
-    <footer className="bg-slate-900 text-gray-300 pt-12 pb-6">
+    <footer className={`${isDark ? 'bg-slate-900 text-gray-300' : 'bg-gray-100 text-gray-700'} pt-12 pb-6 transition-colors`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top section */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
@@ -16,10 +18,10 @@ const Footer = () => {
                 alt="Logo"
                 className="w-10 h-10 rounded-full object-cover border-2"
               />
-              <span className="text-2xl font-bold text-white">MovieMaster</span>
+              <span className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>MovieMaster</span>
             </div>
 
-            <p className="text-gray-400 mb-4">
+            <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} mb-4`}>
               Your ultimate destination for discovering and enjoying the best
               movies from around the world.
             </p>
@@ -27,20 +29,20 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Quick Links</h3>
+            <h3 className={`${isDark ? 'text-white' : 'text-gray-900'} font-semibold mb-4`}>Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="hover:text-gray-400 transition-colors">
+                <a href="#" className={`${isDark ? 'hover:text-gray-400' : 'hover:text-gray-900'} transition-colors`}>
                   Home
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-400 transition-colors">
+                <a href="#" className={`${isDark ? 'hover:text-gray-400' : 'hover:text-gray-900'} transition-colors`}>
                   Movies
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-400 transition-colors">
+                <a href="#" className={`${isDark ? 'hover:text-gray-400' : 'hover:text-gray-900'} transition-colors`}>
                   Contact
                 </a>
               </li>
@@ -49,7 +51,7 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Contact</h3>
+            <h3 className={`${isDark ? 'text-white' : 'text-gray-900'} font-semibold mb-4`}>Contact</h3>
             <ul className="space-y-2">
               <li className="flex items-center space-x-2">
                 <Mail className="w-4 h-4" />
@@ -68,9 +70,9 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-slate-800 pt-6">
+        <div className={`border-t ${isDark ? 'border-slate-800' : 'border-gray-300'} pt-6`}>
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-sm text-gray-400">
+            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               &copy; {currentYear} MovieMaster. All rights reserved.
             </p>
 
@@ -80,7 +82,7 @@ const Footer = () => {
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-gray-400 transition-colors"
+                className={`${isDark ? 'hover:text-gray-400' : 'hover:text-gray-900'} transition-colors`}
               >
                 <svg
                   className="w-6 h-6"
@@ -96,7 +98,7 @@ const Footer = () => {
                 href="https://twitter.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-gray-400 transition-colors"
+                className={`${isDark ? 'hover:text-gray-400' : 'hover:text-gray-900'} transition-colors`}
               >
                 <svg
                   className="w-6 h-6"
@@ -112,7 +114,7 @@ const Footer = () => {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-gray-400 transition-colors"
+                className={`${isDark ? 'hover:text-gray-400' : 'hover:text-gray-900'} transition-colors`}
               >
                 <svg
                   className="w-6 h-6"
