@@ -25,3 +25,5 @@ src/firebase.init.js
 *.njsproj
 *.sln
 *.sw?
+.env
+server/.env

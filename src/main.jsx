@@ -12,6 +12,10 @@ import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import AllMovies from "./pages/AllMovies";
 import MyCollection from "./pages/MyCollection";
+import MovieDetails from "./pages/MovieDetails";
+import AddMovie from "./pages/AddMovie";
+import UpdateMovie from "./pages/UpdateMovie";
+import Watchlist from "./pages/Watchlist";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -41,6 +45,22 @@ const router = createBrowserRouter([
       {
         path: "my-collection",
         element: <MyCollection />,
+      },
+      {
+        path: "watchlist",
+        element: <Watchlist />,
+      },
+      {
+        path: "movies/:id",
+        element: <MovieDetails />,
+      },
+      {
+        path: "movies/add",
+        element: <AddMovie />,
+      },
+      {
+        path: "movies/update/:id",
+        element: <UpdateMovie />,
       },
       {
         path: "*",

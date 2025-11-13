@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, LogOut, Sun, Moon } from "lucide-react";
+import { Menu, X, LogOut, Sun, Moon, UserCircle2, Bookmark } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { toast } from "react-toastify";
@@ -9,8 +9,9 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   const { user, signOut } = useAuth();
-  const { theme, toggleTheme, isDark } = useTheme();
+  const { toggleTheme, isDark } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const profileRef = useRef(null);
@@ -32,6 +33,34 @@ const Navbar = () => {
     };
   }, [isProfileOpen]);
 
+  useEffect(() => {
+    if (user?.photoURL) {
+      setAvatarError(false);
+    }
+  }, [user?.photoURL]);
+
+  const avatarSrc = useMemo(() => {
+    if (!user?.photoURL || avatarError) {
+      return null;
+    }
+
+    const trimmed = user.photoURL.trim();
+
+    if (!trimmed) {
+      return null;
+    }
+
+    if (trimmed.startsWith("data:image/svg+xml")) {
+      return trimmed;
+    }
+
+    if (trimmed.startsWith("<svg") || trimmed.startsWith("<?xml")) {
+      return `data:image/svg+xml;utf8,${encodeURIComponent(trimmed)}`;
+    }
+
+    return trimmed;
+  }, [user?.photoURL, avatarError]);
+
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -48,6 +77,8 @@ const Navbar = () => {
     { path: "/", label: "Home" },
     { path: "/all-movies", label: "All Movies" },
     { path: "/my-collection", label: "My Collection", protected: true },
+    { path: "/watchlist", label: "My Watchlist", protected: true },
+    { path: "/movies/add", label: "Add Movie", protected: true },
   ];
 
   const isActive = (path) => {
@@ -126,23 +157,32 @@ const Navbar = () => {
                       : "hover:bg-gray-100"
                   }`}
                 >
-                  {user.photoURL ? (
+                  {avatarSrc ? (
                     <img
-                      src={user.photoURL}
+                      src={avatarSrc}
                       alt={user.displayName || user.email}
                       className={`w-8 h-8 rounded-full border-2 object-cover ${
                         isDark ? "border-gray-600" : "border-gray-300"
                       }`}
+                      referrerPolicy="no-referrer"
+                      onError={() => setAvatarError(true)}
                     />
                   ) : (
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
-                      isDark
-                        ? "bg-slate-700 text-white"
-                        : "bg-gray-200 text-gray-900"
-                    }`}>
-                      {user.displayName?.[0]?.toUpperCase() ||
-                        user.email?.[0]?.toUpperCase() ||
-                        "U"}
+                    <div
+                      className={`w-9 h-9 rounded-full flex items-center justify-center ${
+                        isDark
+                          ? "bg-slate-700 text-white"
+                          : "bg-gray-200 text-gray-900"
+                      }`}
+                    >
+                      {user.displayName || user.email ? (
+                        (user.displayName?.[0] ||
+                          user.email?.[0] ||
+                          "U"
+                        ).toUpperCase()
+                      ) : (
+                        <UserCircle2 className="w-5 h-5" />
+                      )}
                     </div>
                   )}
                 </button>
@@ -182,6 +222,18 @@ const Navbar = () => {
                         {user.email}
                       </p>
                     </div>
+                    <Link
+                      to="/watchlist"
+                      onClick={() => setIsProfileOpen(false)}
+                      className={`w-full px-4 py-2 text-left flex items-center space-x-2 transition-colors ${
+                        isDark
+                          ? "hover:bg-slate-700 text-gray-300"
+                          : "hover:bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      <Bookmark className="w-4 h-4" />
+                      <span>My Watchlist</span>
+                    </Link>
                     <button
                       onClick={handleSignOut}
                       className={`w-full px-4 py-2 text-left flex items-center space-x-2 transition-colors ${
@@ -219,6 +271,19 @@ const Navbar = () => {
                   Register
                 </Link>
               </div>
+            )}
+            {user && (
+              <button
+                onClick={handleSignOut}
+                className={`hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                  isDark
+                    ? "bg-slate-800 text-gray-100 hover:bg-slate-700"
+                    : "bg-gray-200 text-gray-900 hover:bg-gray-300"
+                }`}
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
             )}
           </div>
 
@@ -269,23 +334,30 @@ const Navbar = () => {
                   isDark ? "border-slate-700" : "border-gray-200"
                 }`}>
                   <div className="flex items-center space-x-2 mb-2">
-                    {user.photoURL ? (
+                    {avatarSrc ? (
                       <img
-                        src={user.photoURL}
+                        src={avatarSrc}
                         alt={user.displayName || user.email}
                         className={`w-8 h-8 rounded-full border-2 object-cover ${
                           isDark ? "border-gray-600" : "border-gray-300"
                         }`}
+                        referrerPolicy="no-referrer"
+                        onError={() => setAvatarError(true)}
                       />
                     ) : (
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                         isDark
                           ? "bg-slate-700 text-white"
                           : "bg-gray-200 text-gray-900"
                       }`}>
-                        {user.displayName?.[0]?.toUpperCase() ||
-                          user.email?.[0]?.toUpperCase() ||
-                          "U"}
+                        {user.displayName || user.email ? (
+                          (user.displayName?.[0] ||
+                            user.email?.[0] ||
+                            "U"
+                          ).toUpperCase()
+                        ) : (
+                          <UserCircle2 className="w-4 h-4" />
+                        )}
                       </div>
                     )}
                     <div>
@@ -301,6 +373,21 @@ const Navbar = () => {
                       </p>
                     </div>
                   </div>
+                  <Link
+                    to="/watchlist"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      setIsProfileOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-md text-base font-medium flex items-center space-x-2 transition-colors ${
+                      isDark
+                        ? "text-gray-300 hover:bg-slate-700 hover:text-white"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    }`}
+                  >
+                    <Bookmark className="w-4 h-4" />
+                    <span>My Watchlist</span>
+                  </Link>
                   <button
                     onClick={handleSignOut}
                     className={`w-full text-left px-3 py-2 rounded-md text-base font-medium flex items-center space-x-2 transition-colors ${
