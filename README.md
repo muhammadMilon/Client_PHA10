@@ -1,16 +1,103 @@
-# React + Vite
+# 🎬 MovieMaster Pro — Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**MovieMaster Pro** is a full-featured movie management web application where users can browse, manage, and organize their favorite movies with ease.
+It features a sleek UI, dynamic data rendering, secure authentication, and personalized collections — all powered by a modern React-based frontend.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🌐 Live Site
 
-## React Compiler
+🔗 **[Smesh Me](https://moviemaster-milon.web.app/)**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🧠 Overview
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+MovieMaster Pro provides a clean and responsive user interface for discovering and managing movies.
+Users can register, log in, explore movie details, and maintain their own movie collection — all seamlessly connected with a secure backend API.
+
+---
+
+## ✨ Features
+
+* 🎞️ **Dynamic Movie Listing** — Displays all movies from MongoDB via REST API
+* 🧑‍💻 **User Authentication** — Secure login & registration with Firebase
+* 💾 **My Collection** — Manage your own added movies
+* 🧩 **CRUD Support** — Add, update, delete movies easily
+* 🔒 **Protected Routes** — Restrict sensitive pages to logged-in users
+* 🌗 **Dark / Light Theme Toggle** — Switch between themes for better UX
+* 📱 **Fully Responsive** — Works flawlessly on mobile, tablet, and desktop
+* 🎨 **Modern UI/UX** — Eye-catching cards, smooth animations, and clean layout
+
+---
+
+## ⚙️ Tech Stack
+
+* **Frontend Framework:** React.js (Vite)
+* **Routing:** React Router
+* **Authentication:** Firebase Auth
+* **Styling:** Tailwind CSS + DaisyUI
+* **Notifications:** React Hot Toast
+* **Deployment:** Netlify
+
+---
+
+## 🧩 Folder Structure
+
+```
+MovieMaster-Pro-Client/
+│
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── routes/
+│   ├── context/
+│   ├── hooks/
+│   ├── assets/
+│   └── App.jsx
+├── public/
+│   └── index.html
+├── package.json
+└── vite.config.js
+```
+
+---
+
+## 🚀 Local Setup
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/muhammadMilon/Client_PHA10.git
+   cd moviemaster-pro-client
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Create `.env` file**
+
+   ```env
+   VITE_API_URL=https://moviemaster-pro-server.vercel.app
+   VITE_FIREBASE_API_KEY=your_firebase_api_key
+   ```
+
+4. **Run the development server**
+
+   ```bash
+   npm run dev
+   ```
+
+5. Open in browser → `http://localhost:5173`
+
+---
+
+## 🧾 Developer Info
+
+**👨‍💻 Author:** Muhammad Milon
+📧 **Email:** [mmilon82814@gmail.com](mailto:mmilon82814@gmail.com)
+💻 **Backend Repo:** [MovieMaster Pro Server](https://github.com/muhammadMilon/Server_PHA10)
+🚀 **Live API:** [https://moviemaster-pro-server.vercel.app](https://moviemaster-pro-server.vercel.app)
